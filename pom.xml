@@ -7,6 +7,8 @@
 	<modules>
 		<module>licensing-service</module>
 		<module>configserver</module>
+		<module>organization-service</module>
+		<module>eurekaserver</module>
 	</modules>
 
 	<parent>
