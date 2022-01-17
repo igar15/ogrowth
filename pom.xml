@@ -9,6 +9,7 @@
 		<module>configserver</module>
 		<module>organization-service</module>
 		<module>eurekaserver</module>
+		<module>gatewayserver</module>
 	</modules>
 
 	<parent>
