@@ -33,8 +33,46 @@ services:
         aliases:
           - "configserver"
 
+  eurekaserver:
+    image: ostock/eurekaserver
+    ports:
+    - "8070:8070"
+    environment:
+      SPRING_PROFILES_ACTIVE: "dev"
+      SPRING_CLOUD_CONFIG_URI: "http://configserver:8071"
+    depends_on:
+      database:
+        condition: service_healthy
+      configserver:
+        condition: service_started
+    networks:
+      backend:
+        aliases:
+          - "eurekaserver"
+
+  gatewayserver:
+    image: ostock/gatewayserver
+    ports:
+    - "8072:8072"
+    environment:
+      SPRING_PROFILES_ACTIVE: "dev"
+      SPRING_CLOUD_CONFIG_URI: "http://configserver:8071"
+    depends_on:
+      database:
+        condition: service_healthy
+      configserver:
+        condition: service_started
+      eurekaserver:
+        condition: service_started
+    networks:
+      backend:
+        aliases:
+          - "gateway"
+
   licensingservice:
     image: ostock/licensing-service
+    ports:
+      - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: "dev"
       SPRING_CLOUD_CONFIG_URI: "http://configserver:8071"
@@ -44,12 +82,28 @@ services:
         condition: service_healthy
       configserver:
         condition: service_started
-    ports:
-      - "8080:8080"
     networks:
       backend:
         aliases:
           - "licenseservice"
+
+  organizationservice:
+    image: ostock/organization-service
+    ports:
+    - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: "dev"
+      SPRING_CLOUD_CONFIG_URI: "http://configserver:8071"
+      ENCRYPT_KEY: "IMSYMMETRIC"
+    depends_on:
+      database:
+        condition: service_healthy
+      configserver:
+        condition: service_started
+    networks:
+      backend:
+        aliases:
+          - "organizationservice"
 
 networks:
   backend:
