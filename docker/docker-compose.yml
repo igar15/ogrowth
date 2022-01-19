@@ -72,7 +72,7 @@ services:
   licensingservice:
     image: ostock/licensing-service
     ports:
-      - "8080:8080"
+      - "8180:8080"
     environment:
       SPRING_PROFILES_ACTIVE: "dev"
       SPRING_CLOUD_CONFIG_URI: "http://configserver:8071"
@@ -104,6 +104,27 @@ services:
       backend:
         aliases:
           - "organizationservice"
+
+  keycloak:
+    image: jboss/keycloak
+    restart: always
+    environment:
+      KEYCLOAK_VERSION: 6.0.1
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    ports:
+    - "8080:8080"
+    volumes:
+      - ./realm-export.json:/opt/jboss/keycloak/realm-export.json
+    command:
+      - "-b 0.0.0.0"
+      - "-Dkeycloak.import=/opt/jboss/keycloak/realm-export.json"
+      - "-Dkeycloak.profile.feature.scripts=enabled"
+      - "-Dkeycloak.profile.feature.upload_scripts=enabled"
+    networks:
+      backend:
+        aliases:
+          - "keycloak"
 
 networks:
   backend:
