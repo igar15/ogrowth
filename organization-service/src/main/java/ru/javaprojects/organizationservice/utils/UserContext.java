@@ -1,5 +1,6 @@
 package ru.javaprojects.organizationservice.utils;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -9,38 +10,44 @@ public class UserContext {
     public static final String USER_ID        = "tmx-user-id";
     public static final String ORG_ID         = "tmx-org-id";
 
-    private String correlationId= new String();
-    private String authToken= new String();
-    private String userId = new String();
-    private String orgId = new String();
+    private final ThreadLocal<String> correlationId= new ThreadLocal<>();
+    private final ThreadLocal<String> authToken= new ThreadLocal<>();
+    private final ThreadLocal<String> userId = new ThreadLocal<>();
+    private final ThreadLocal<String> orgId = new ThreadLocal<>();
 
-    public String getCorrelationId() { return correlationId;}
+    public String getCorrelationId() { return correlationId.get();}
     public void setCorrelationId(String correlationId) {
-        this.correlationId = correlationId;
+        this.correlationId.set(correlationId);
     }
 
     public String getAuthToken() {
-        return authToken;
+        return authToken.get();
     }
 
     public void setAuthToken(String authToken) {
-        this.authToken = authToken;
+        this.authToken.set(authToken);
     }
 
     public String getUserId() {
-        return userId;
+        return userId.get();
     }
 
     public void setUserId(String userId) {
-        this.userId = userId;
+        this.userId.set(userId);
     }
 
     public String getOrgId() {
-        return orgId;
+        return orgId.get();
     }
 
     public void setOrgId(String orgId) {
-        this.orgId = orgId;
+        this.orgId.set(orgId);
+    }
+
+    public HttpHeaders getHttpHeaders(){
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set(CORRELATION_ID, getCorrelationId());
+        return httpHeaders;
     }
 
 }

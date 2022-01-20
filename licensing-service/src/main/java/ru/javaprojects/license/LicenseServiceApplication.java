@@ -2,17 +2,25 @@ package ru.javaprojects.license;
 
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import ru.javaprojects.license.config.ServiceConfig;
+import ru.javaprojects.license.events.model.OrganizationChangeModel;
 import ru.javaprojects.license.utils.UserContextInterceptor;
 
 import java.util.Collections;
@@ -23,11 +31,23 @@ import java.util.Locale;
 @RefreshScope
 @EnableDiscoveryClient // in real app choose 1 of them (discovery or feign)
 @EnableFeignClients
+@EnableBinding(Sink.class)
 public class LicenseServiceApplication {
+
+    @Autowired
+    private ServiceConfig serviceConfig;
+
+    private static final Logger logger = LoggerFactory.getLogger(LicenseServiceApplication.class);
 
     public static void main(String[] args) {
         SpringApplication.run(LicenseServiceApplication.class, args);
     }
+
+    @StreamListener(Sink.INPUT)
+	public void loggerSink(OrganizationChangeModel orgChange) {
+        System.out.println("123");
+		logger.debug("Received {} event for the organization id {}", orgChange.getAction(), orgChange.getOrganizationId());
+	}
 
     @Bean
     public LocaleResolver localeResolver() {
