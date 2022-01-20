@@ -60,7 +60,7 @@ public class LicenseService {
             license.setContactPhone(organization.getContactPhone());
         }
 
-        return license.withComment(config.getProperty());
+        return license.withComment(config.getExampleProperty());
     }
 
     private Organization retrieveOrganizationInfo(String organizationId, String clientType) {
@@ -91,13 +91,13 @@ public class LicenseService {
         license.setLicenseId(UUID.randomUUID().toString());
         licenseRepository.save(license);
 
-        return license.withComment(config.getProperty());
+        return license.withComment(config.getExampleProperty());
     }
 
     public License updateLicense(License license){
         licenseRepository.save(license);
 
-        return license.withComment(config.getProperty());
+        return license.withComment(config.getExampleProperty());
     }
 
     public String deleteLicense(String licenseId){
